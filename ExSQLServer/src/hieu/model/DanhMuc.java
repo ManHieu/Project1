@@ -6,6 +6,7 @@ public class DanhMuc {
 	private int isDeleted;
 	public String getMaDM() {
 		return maDM;
+	}
 	public void setMaDM(String maDM) {
 		this.maDM = maDM;
 	}
