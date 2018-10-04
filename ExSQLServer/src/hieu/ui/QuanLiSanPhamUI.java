@@ -3,11 +3,13 @@ package hieu.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -18,9 +20,17 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
+
+import hieu.model.DanhMuc;
 
 public class QuanLiSanPhamUI extends JFrame {
+	
+	JList<String> listDanhMuc;
+	JButton btNew,btUpdate,btRemove,btnTaoMoiSp,btnLuuSp,btnXoaSp;
+	DefaultTableModel tbmSanPham;
+	JTextField txtMasp,txtTen,txtSoLuong,txtGia;
+	JComboBox<DanhMuc> cbDanhMuc;
+	
 	public QuanLiSanPhamUI(String title) {
 		// TODO Auto-generated constructor stub
 		super(title);
@@ -48,7 +58,7 @@ public class QuanLiSanPhamUI extends JFrame {
 		pnMain.add(sp, BorderLayout.CENTER);
 
 		pnLeft.setLayout(new BorderLayout());
-		JList<String> listDanhMuc = new JList<>();
+		listDanhMuc = new JList<>();
 		JScrollPane scpListDanhMuc=new JScrollPane(listDanhMuc,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -59,9 +69,9 @@ public class QuanLiSanPhamUI extends JFrame {
 		pnLeft.add(scpListDanhMuc, BorderLayout.CENTER);
 		
 		JPanel pnButtonleft = new JPanel();
-		JButton btNew = new JButton("New");
-		JButton btUpdate = new JButton("Update");
-		JButton btRemove = new JButton("Remove");
+		btNew = new JButton("New");
+		btUpdate = new JButton("Update");
+		btRemove = new JButton("Remove");
 		pnButtonleft.add(btRemove);
 		pnButtonleft.add(btUpdate);
 		pnButtonleft .add(btNew);
@@ -70,7 +80,7 @@ public class QuanLiSanPhamUI extends JFrame {
 		JLabel lbChiTiet = new JLabel("Thông tin chi tiết", JLabel.CENTER);
 		pnRight.add(lbChiTiet,BorderLayout.NORTH);
 		
-		DefaultTableModel tbmSanPham = new DefaultTableModel();
+		tbmSanPham = new DefaultTableModel();
 		tbmSanPham.addColumn("Mã");
 		tbmSanPham.addColumn("Tên");
 		tbmSanPham.addColumn("Số lượng");
@@ -84,31 +94,38 @@ public class QuanLiSanPhamUI extends JFrame {
 		JPanel pnLuaChon = new JPanel();
 		pnLuaChon.setLayout(new BoxLayout(pnLuaChon, BoxLayout.Y_AXIS));
 		
+		JPanel pnDanhMuc = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		cbDanhMuc = new JComboBox<>();
+		JLabel lbDanhMuc = new JLabel("Danh mục:");
+		pnDanhMuc.add(lbDanhMuc);
+		pnDanhMuc.add(cbDanhMuc);
+		pnLuaChon.add(pnDanhMuc);
+		
 		JPanel pnMaSp=new JPanel();
 		pnMaSp.setLayout(new FlowLayout(FlowLayout.LEFT));
 		JLabel lblMaSp=new JLabel("Mã SP:");
-		JTextField txtMasp=new JTextField(30);
+		txtMasp=new JTextField(30);
 		pnMaSp.add(lblMaSp);
 		pnMaSp.add(txtMasp);
 		pnLuaChon.add(pnMaSp);
 		
 		JPanel pnTen=new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel lblTen=new JLabel("Tên SP:");
-		JTextField txtTen=new JTextField(30);
+		txtTen=new JTextField(30);
 		pnTen.add(lblTen);
 		pnTen.add(txtTen);
 		pnLuaChon.add(pnTen);
 		
 		JPanel pnSoLuong=new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel lblSoLuong=new JLabel("Số lượng SP:");
-		JTextField txtSoLuong=new JTextField(30);
+		txtSoLuong=new JTextField(30);
 		pnSoLuong.add(lblSoLuong);
 		pnSoLuong.add(txtSoLuong);
 		pnLuaChon.add(pnSoLuong);
 		
 		JPanel pnGia=new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel lblGia=new JLabel("Giá SP:");
-		JTextField txtGia=new JTextField(30);
+		txtGia=new JTextField(30);
 		pnGia.add(lblGia);
 		pnGia.add(txtGia);
 		pnLuaChon.add(pnGia);
@@ -116,12 +133,13 @@ public class QuanLiSanPhamUI extends JFrame {
 		lblGia.setPreferredSize(lblSoLuong.getPreferredSize());
 		lblTen.setPreferredSize(lblSoLuong.getPreferredSize());
 		lblMaSp.setPreferredSize(lblSoLuong.getPreferredSize());
+		cbDanhMuc.setPreferredSize(new Dimension(300, 20));
 		
 		JPanel pnButtonSanPham=new JPanel();
 		pnButtonSanPham.setLayout(new FlowLayout());
-		JButton btnTaoMoiSp=new JButton("Tạo mới");
-		JButton btnLuuSp=new JButton("Lưu sản phẩm");
-		JButton btnXoaSp=new JButton("Xóa sản phẩm");
+		btnTaoMoiSp=new JButton("New");
+		btnLuuSp=new JButton("Save");
+		btnXoaSp=new JButton("Remove");
 		pnButtonSanPham.add(btnTaoMoiSp);
 		pnButtonSanPham.add(btnLuuSp);
 		pnButtonSanPham.add(btnXoaSp);
