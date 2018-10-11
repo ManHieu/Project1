@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -22,10 +23,11 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
 import hieu.model.DanhMuc;
+import hieu.service.DanhMucService;
 
 public class QuanLiSanPhamUI extends JFrame {
 	
-	JList<String> listDanhMuc;
+	JList<DanhMuc> listDanhMuc;
 	JButton btNew,btUpdate,btRemove,btnTaoMoiSp,btnLuuSp,btnXoaSp;
 	DefaultTableModel tbmSanPham;
 	JTextField txtMasp,txtTen,txtSoLuong,txtGia;
@@ -36,6 +38,19 @@ public class QuanLiSanPhamUI extends JFrame {
 		super(title);
 		showWindow();
 		addControls();
+		addEvents();
+	}
+
+	private void addEvents() {
+		// TODO Auto-generated method stub
+		hienThiDanhMuc();
+	}
+
+	private void hienThiDanhMuc() {
+		// TODO Auto-generated method stub
+		 DanhMucService dms = new DanhMucService();
+		 Vector<DanhMuc> vec = dms.ReadDanhMuc();
+		 listDanhMuc.setListData(vec);
 	}
 
 	private void addControls() {

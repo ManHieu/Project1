@@ -4,20 +4,20 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class SQLService {
-	Connection conn = null;
-	
-	public Connection getConnect(String server, String database) {
-		try {
+	protected Connection conn=null;
+	public SQLService () {
+		try
+		{
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			String connectionUrl = "jdbc:sqlserver://" + server 
-					+ ":1433;databaseName=" + database
-					+ ";integratedSecurity=true;";
-			conn = DriverManager.getConnection(connectionUrl);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
+			// Mở driver 
+			String connectionUrl=
+					"jdbc:sqlserver://DESKTOP-MITQQAR:1433;databaseName=dbQuanLySanPham;integratedSecurity=true;";
+			conn= DriverManager.getConnection(connectionUrl);
+//			System.out.println("Kết nối thành công!");
 		}
-		return conn;
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
 	}
-	
 }
