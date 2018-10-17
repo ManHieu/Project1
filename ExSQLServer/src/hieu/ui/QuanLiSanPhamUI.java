@@ -5,6 +5,12 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -14,6 +20,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -23,7 +30,10 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
 import hieu.model.DanhMuc;
+import hieu.model.SanPham;
 import hieu.service.DanhMucService;
+import hieu.service.SanPhamService;
+
 
 public class QuanLiSanPhamUI extends JFrame {
 	
@@ -32,6 +42,8 @@ public class QuanLiSanPhamUI extends JFrame {
 	DefaultTableModel tbmSanPham;
 	JTextField txtMasp,txtTen,txtSoLuong,txtGia;
 	JComboBox<DanhMuc> cbDanhMuc;
+	ArrayList<SanPham> dsSP = null;
+	JTable tbSanPham;
 	
 	public QuanLiSanPhamUI(String title) {
 		// TODO Auto-generated constructor stub
@@ -44,13 +56,131 @@ public class QuanLiSanPhamUI extends JFrame {
 	private void addEvents() {
 		// TODO Auto-generated method stub
 		hienThiDanhMuc();
+		listDanhMuc.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				if(listDanhMuc.getSelectedValue() == null) return;
+				SanPhamService sps = new SanPhamService();
+				String maDM = listDanhMuc.getSelectedValue().getMaDM();
+				dsSP = sps.getDsSp(maDM);
+				tbmSanPham.setRowCount(0);
+				for(SanPham sp : dsSP) {
+					Vector<Object> vec = new Vector<>();
+					vec.add(sp.getMaSP());
+					vec.add(sp.getTenSP());
+					vec.add(sp.getSoLuong());
+					vec.add(sp.getDonGia());
+					tbmSanPham.addRow(vec);
+				}
+				cbDanhMuc.setSelectedIndex(listDanhMuc.getSelectedIndex());
+			}
+		});
+		tbSanPham.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				int row = tbSanPham.getSelectedRow();
+				if(row == -1) return;
+				SanPham sp = dsSP.get(row);
+				txtMasp.setText(sp.getMaSP());
+				txtTen.setText(sp.getTenSP());
+				txtSoLuong.setText(sp.getSoLuong()+"");
+				txtGia.setText(sp.getDonGia()+"");
+			}
+		});
+		btnTaoMoiSp.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				txtGia.setText("");
+				txtMasp.setText("");
+				txtTen.setText("");
+				txtSoLuong.setText("");
+				txtMasp.requestFocus();
+			}
+		});
+		
+		btnLuuSp.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				SanPham sp = new SanPham();
+				String maDM = listDanhMuc.getSelectedValue().getMaDM();
+				sp.setMaDM(maDM);
+				sp.setDonGia(Integer.parseInt(txtGia.getText()));
+				sp.setMaSP(txtMasp.getText());
+				sp.setTenSP(txtTen.getText());
+				sp.setSoLuong(Integer.parseInt(txtSoLuong.getText()));
+				sp.setIsDeleted(0);
+				SanPhamService sps = new SanPhamService();
+				Boolean t = sps.themSanPham(sp);
+				if(t == true) JOptionPane.showMessageDialog(null, "Lưu SP thành công");
+			}
+		});
 	}
 
 	private void hienThiDanhMuc() {
 		// TODO Auto-generated method stub
 		 DanhMucService dms = new DanhMucService();
-		 Vector<DanhMuc> vec = dms.ReadDanhMuc();
+		 Vector<DanhMuc> vec = dms.hienThiDanhMuc();
 		 listDanhMuc.setListData(vec);
+		 cbDanhMuc.removeAllItems();
+		 for (DanhMuc dm : vec) {
+			 cbDanhMuc.addItem(dm);
+		 }
 	}
 
 	private void addControls() {
@@ -100,7 +230,7 @@ public class QuanLiSanPhamUI extends JFrame {
 		tbmSanPham.addColumn("Tên");
 		tbmSanPham.addColumn("Số lượng");
 		tbmSanPham.addColumn("Đơn giá");
-		JTable tbSanPham= new JTable(tbmSanPham);
+		tbSanPham= new JTable(tbmSanPham);
 		JScrollPane scpTableSanPham=new JScrollPane(tbSanPham,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
