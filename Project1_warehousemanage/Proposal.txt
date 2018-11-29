@@ -1,0 +1,12 @@
+﻿Chương trình Quản lý kho hàng
+
+Miêu tả: Quản lý kho hàng của một cửa hàng bán đồ điện tử
+
+Các chức năng chính:
+
+- Đăng nhập, đăng ký tài khoản 
+- Hiển thị list danh mục sản phẩm
+- Hiển thị danh sách các sản phẩm có trong kho hàng
+- Sau khi đăng nhập cho phép thêm sửa xóa các sản phẩm
+- Tìm kiếm, thống kê sản phẩm theo tên, giá tiền, số lượng còn trong kho
+- Cho phép cập nhật các sản phẩm mới từ máy khác
