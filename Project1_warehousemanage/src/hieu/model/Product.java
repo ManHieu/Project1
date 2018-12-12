@@ -8,7 +8,7 @@ public class Product {
 	private int amount;
 	private int status;
 	private int idCategory;
-	private String color;
+
 	
 	public int getID() {
 		return ID;
@@ -52,12 +52,7 @@ public class Product {
 	public void setIdCategory(int idCategory) {
 		this.idCategory = idCategory;
 	}
-	public String getColor() {
-		return color;
-	}
-	public void setColor(String color) {
-		this.color = color;
-	}
+
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub

@@ -14,10 +14,8 @@ public class ProductService {
 		try {
 			Connection conn = DatabaseConnec.getConnect();
 			Statement stm = conn.createStatement();
-			String sql = "SELECT * FROM dbqlkh.sanpham, mausac, mausanpham "
-					+ "where sanpham.idSanPham = mausanpham.idSanPham "
-					+ "and mausanpham.idMauSac = mausac.idMauSac "
-					+ "and sanpham.TrangThai = 1;" ;
+			String sql = "SELECT * FROM dbqlkh.sanpham "
+					+ "where sanpham.TrangThai = 1;" ;
 			ResultSet rs = stm.executeQuery(sql);
 			while(rs.next()) {
 				Product product = new Product();
@@ -26,7 +24,6 @@ public class ProductService {
 				product.setCost(rs.getInt(3));
 				product.setManufacturerName(rs.getString(4));
 				product.setAmount(rs.getInt(5));
-				product.setColor(rs.getString(10));
 				product.setStatus(1);
 				product.setIdCategory(rs.getInt(8));
 				
