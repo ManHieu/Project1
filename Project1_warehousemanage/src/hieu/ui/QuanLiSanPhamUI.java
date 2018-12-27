@@ -18,6 +18,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -36,16 +37,18 @@ import javax.swing.table.DefaultTableModel;
 
 import hieu.model.Category;
 import hieu.model.Product;
+import hieu.net.Client;
+import hieu.service.CategoryService;
 
 
 
 public class QuanLiSanPhamUI extends JFrame {
 
 	JList<Category> listDanhMuc;
-	JButton btNew,btUpdate,btRemove,btnTaoMoiSp,btnLuuSp,btnXoaSp, btnNewImport, btnSaveImport;
+	JButton btNew,btUpdate,btRemove, btnInsert ,btnTaoMoiSp, btnThem, btnLuuSp,btnXoaSp, btnNewImport, btnSaveImport;
 	DefaultTableModel tbmSanPham, tbmKho, tbmDoanhThu;
 	JTextField txtMasp,txtTen,txtSoLuong,txtGia, txtHang, txtSoLuongNhap, txtGiaNhap, txtMaNhap, txtNgayNhap;
-	JComboBox<Category> cbDanhMuc;
+	JComboBox<Category> cbDanhMuc, cbDanhMuc2;
 	ArrayList<Product> dsSP = null;
 	JTable tbSanPham, tbKho, tbDoanhThu;
 	JPanel pnInfo, pnSanPham, pnKho, pnDoanhThu;
@@ -130,6 +133,78 @@ public class QuanLiSanPhamUI extends JFrame {
 				pnInfo.add(pnDoanhThu,BorderLayout.SOUTH);
 			}
 		});
+		
+		showCategory();
+		listDanhMuc.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				Category cate = listDanhMuc.getSelectedValue();
+				if(cate == null) return;
+				else {
+					Client client = new Client("localhost", 3333);
+					Vector<Product> list = null;
+					
+					client.sendRequest("listProduct");
+					client.sendRequest(cate.getIdCategory()+"");
+					list = (Vector<Product>) client.receiveAnswer();
+					for(Product pro : list) {
+						Vector<Object> vec = new Vector<>();
+						vec.add(pro.getID());
+						vec.add(pro.getProductName());
+						vec.add(pro.getAmount());
+						vec.add(pro.getCost());
+						vec.add(pro.getManufacturerName());
+						tbmSanPham.addRow(vec);
+					}
+					
+					cbDanhMuc2.setSelectedIndex(listDanhMuc.getSelectedIndex());
+				}
+			}
+		});
+		
+	}
+	
+	private void showCategory() {
+		// TODO Auto-generated method stub
+		Vector<Category> list = null;
+		Client client = new Client("localhost", 3333);
+		
+		client.sendRequest("listCate");
+		list = (Vector<Category>) client.receiveAnswer();
+		
+		listDanhMuc.setListData(list);
+		cbDanhMuc.removeAllItems();
+		cbDanhMuc2.removeAllItems();
+		 for (Category cate : list) {
+			 cbDanhMuc.addItem(cate);
+			 cbDanhMuc2.addItem(cate);
+		 }
 	}
 
 	private void addControls() {
@@ -166,9 +241,11 @@ public class QuanLiSanPhamUI extends JFrame {
 		btNew = new JButton("New");
 		btUpdate = new JButton("Update");
 		btRemove = new JButton("Remove");
+		btnInsert = new JButton("Insert");
 		pnButtonleft.add(btRemove);
 		pnButtonleft.add(btUpdate);
 		pnButtonleft .add(btNew);
+		pnButtonleft.add(btnInsert);
 		pnLeft.add(pnButtonleft,BorderLayout.SOUTH);
 
 		JLabel lbChiTiet = new JLabel("Thông tin chi tiết", JLabel.CENTER);
@@ -177,6 +254,10 @@ public class QuanLiSanPhamUI extends JFrame {
 		pnInfo = new JPanel();
 		pnInfo.setLayout(new BorderLayout());
 		pnRight.add(pnInfo);
+		
+		cbDanhMuc = new JComboBox<>();
+		cbDanhMuc2 = new JComboBox<>();
+		
 		
 		// Tồn kho
 		{
@@ -198,10 +279,9 @@ public class QuanLiSanPhamUI extends JFrame {
 			pnSanPham.setLayout(new BoxLayout(pnSanPham, BoxLayout.Y_AXIS));
 
 			JPanel pnDanhMuc = new JPanel(new FlowLayout(FlowLayout.CENTER));
-			cbDanhMuc = new JComboBox<>();
 			JLabel lbDanhMuc = new JLabel("Danh mục:");
 			pnDanhMuc.add(lbDanhMuc);
-			pnDanhMuc.add(cbDanhMuc);
+			pnDanhMuc.add(cbDanhMuc2);
 			pnSanPham.add(pnDanhMuc);
 
 			JPanel pnMaSp=new JPanel();
@@ -244,14 +324,16 @@ public class QuanLiSanPhamUI extends JFrame {
 			lblTen.setPreferredSize(lblSoLuong.getPreferredSize());
 			lblMaSp.setPreferredSize(lblSoLuong.getPreferredSize());
 			lblHang.setPreferredSize(lblSoLuong.getPreferredSize());
-			cbDanhMuc.setPreferredSize(new Dimension(300, 20));
+			cbDanhMuc2.setPreferredSize(new Dimension(300, 20));
 
 			JPanel pnButtonSanPham=new JPanel();
 			pnButtonSanPham.setLayout(new FlowLayout());
 			btnTaoMoiSp=new JButton("New");
+			btnThem = new JButton("Insert");
 			btnLuuSp=new JButton("Save");
 			btnXoaSp=new JButton("Remove");
 			pnButtonSanPham.add(btnTaoMoiSp);
+			pnButtonSanPham.add(btnThem);
 			pnButtonSanPham.add(btnLuuSp);
 			pnButtonSanPham.add(btnXoaSp);
 			pnSanPham.add(pnButtonSanPham);
@@ -276,7 +358,6 @@ public class QuanLiSanPhamUI extends JFrame {
 			pnKho.setLayout(new BoxLayout(pnKho, BoxLayout.Y_AXIS));
 			
 			JPanel pnDanhMuc = new JPanel(new FlowLayout(FlowLayout.CENTER));
-			cbDanhMuc = new JComboBox<>();
 			JLabel lbDanhMuc = new JLabel("Danh mục:");
 			pnDanhMuc.add(lbDanhMuc);
 			pnDanhMuc.add(cbDanhMuc);

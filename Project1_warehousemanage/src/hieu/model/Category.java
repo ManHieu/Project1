@@ -1,9 +1,18 @@
 package hieu.model;
 
-public class Category {
+import java.io.Serializable;
+
+public class Category implements Serializable{
 	private String nameCategory;
 	private int idCategory;
+	private int status;
 	
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
 	public String getNameCategory() {
 		return nameCategory;
 	}

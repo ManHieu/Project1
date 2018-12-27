@@ -5,7 +5,14 @@ public class Promotion {
 	private String startDay;
 	private String endDay;
 	private int promoValue;
+	private int status;
 
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
 	public int getIdPromo() {
 		return idPromo;
 	}

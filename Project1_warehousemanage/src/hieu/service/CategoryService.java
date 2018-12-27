@@ -30,7 +30,7 @@ public class CategoryService {
 		return listCate;
  	}
 	
-	public static boolean updateCategory(Category cate) {
+	public static boolean insertCategory(Category cate) {
 		try {
 			Connection conn = DatabaseConnec.getConnect();
 			
@@ -49,9 +49,40 @@ public class CategoryService {
 		}
 		return true;
 	}
+	
+	public static boolean updateCategory(Category cate) {
+		try {
+			Connection conn = DatabaseConnec.getConnect();
+			
+			String sql = "update danhmuc set TenDanhMuc = ?, idDanhMucCha = ?, status = ? where idDanhMuc = ?";
+			PreparedStatement pstm = conn.prepareStatement(sql);
+			pstm.setInt(4, cate.getIdCategory());
+			pstm.setString(1, cate.getNameCategory());
+			pstm.setInt(2, 1);
+			pstm.setInt(3, cate.getStatus());
+			
+			int rowEff = pstm.executeUpdate();
+			if(rowEff == 0) return false;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return true;
+	}
+	
 //	public static void main(String[] args) {
 //		Vector<Category> vec = CategoryService.getCategory();
-//		System.out.println(vec);
+//		Category cate = new Category();
+//		cate.setIdCategory(50);
+//		cate.setNameCategory("test");
+//		cate.setStatus(0);
+//		boolean result = CategoryService.updateCategory(cate);
+//		
+//		System.out.println(cate.getIdCategory());
+//		System.out.println(cate.getNameCategory());
+//		System.out.println(cate.getStatus());
+//		
+//		System.out.println("Thành công ? "  +result);
 //	}
 }
 

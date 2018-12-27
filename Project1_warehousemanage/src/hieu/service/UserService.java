@@ -36,7 +36,7 @@ public class UserService {
 		return listUser;
 	}
 
-	public static boolean updateUser(User user) {
+	public static boolean insertUser(User user) {
 		try {
 			Connection conn = DatabaseConnec.getConnect();
 
@@ -55,22 +55,13 @@ public class UserService {
 		}
 		return true;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	public int find(User user) {
+		Vector<User> list= UserService.getUser();
+		for(User candi : list) {
+			if(user.getUsername().equals(candi.getUsername()) && user.getPassword().equals(candi.getPassword()))
+				return 1;
+		}
+		return 0;
+	}
 
 }

@@ -1,6 +1,8 @@
 package hieu.model;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable{
 	private int idUser;
 	private String name;
 	private String username;
