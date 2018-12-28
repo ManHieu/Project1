@@ -36,7 +36,33 @@ public class ProductService {
 		}
 		return listProduct;
 	}
+	
+	public static Vector<Product> getProduct(){
+		Vector<Product> listProduct = new Vector<>();
+		try {
+			Connection conn = DatabaseConnec.getConnect();
+			Statement stm = conn.createStatement();
+			String sql = "SELECT * FROM dbqlkh.sanpham;" ;
+			ResultSet rs = stm.executeQuery(sql);
+			while(rs.next()) {
+				Product product = new Product();
+				product.setID(rs.getInt(1));
+				product.setProductName(rs.getString(2));
+				product.setCost(rs.getInt(3));
+				product.setManufacturerName(rs.getString(4));
+				product.setAmount(rs.getInt(5));
+				product.setStatus(1);
+				product.setIdCategory(rs.getInt(8));
 
+				listProduct.add(product);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return listProduct;
+	}
+	
 	public static boolean insertProduct(Product product) {
 		try {
 			Connection conn = DatabaseConnec.getConnect();

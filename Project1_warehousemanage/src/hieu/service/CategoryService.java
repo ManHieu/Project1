@@ -20,7 +20,7 @@ public class CategoryService {
 				Category category = new Category();
 				category.setIdCategory(rs.getInt(1));
 				category.setNameCategory(rs.getString(2));
-				
+				category.setStatus(1);
 				listCate.add(category);
 			}
 		} catch (Exception e) {

@@ -101,6 +101,7 @@ public class UILogin extends JFrame {
 						flag = client.receiveAuthor();
 						client.close();
 						if(flag == 1) {
+							dispose();
 							QuanLiSanPhamUI ui = new QuanLiSanPhamUI("QLSP");
 						}
 						else {

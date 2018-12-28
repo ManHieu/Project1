@@ -10,10 +10,14 @@ import java.net.Socket;
 import java.util.Vector;
 
 import hieu.model.Category;
+import hieu.model.Interest;
 import hieu.model.Product;
+import hieu.model.Storage;
 import hieu.model.User;
 import hieu.service.CategoryService;
+import hieu.service.InterestService;
 import hieu.service.ProductService;
+import hieu.service.StorageService;
 import hieu.service.UserService;
 
 public class Server {
@@ -83,11 +87,24 @@ public class Server {
 					}
 					if(request.equals("listCate")) {
 						ObjectOutputStream oos = new ObjectOutputStream(dos);
-						
+
 						Vector<Category> list = CategoryService.getCategory();
 						oos.writeObject(list);
 						oos.flush();
-						
+
+						oos.close();
+						dos.close();
+						dis.close();
+						socket.close();
+					}
+					
+					if(request.equals("listInterest")) {
+						ObjectOutputStream oos = new ObjectOutputStream(dos);
+
+						Vector<Interest> list = InterestService.statistic();
+						oos.writeObject(list);
+						oos.flush();
+
 						oos.close();
 						dos.close();
 						dis.close();
@@ -99,26 +116,80 @@ public class Server {
 						System.out.println(idCate);
 						Vector<Product> list = ProductService.getProduct(idCate);
 						ObjectOutputStream oos = new  ObjectOutputStream(dos);
-						
+
 						oos.writeObject(list);
 						oos.flush();
-						
+
 						oos.close();
 						dos.close();
 						dis.close();
 						socket.close();
-						
+
 					}
-					} catch (Exception e) {
-						System.err.println(" Connection Error: " + e);
+					if(request.equals("listStorage")) {
+						Vector<Storage> list = StorageService.getStorage();
+						ObjectOutputStream oos = new  ObjectOutputStream(dos);
+
+						oos.writeObject(list);
+						oos.flush();
+
+						oos.close();
+						dos.close();
+						dis.close();
+						socket.close();
+
 					}
+					
+					if(request.equals("updateCate")) {
+						ObjectInputStream ois = new ObjectInputStream(dis);
+						Category cate = (Category) ois.readObject();
+						CategoryService.updateCategory(cate);
+
+						ois.close();
+						dos.close();
+						dis.close();
+						socket.close();
+					}
+					if(request .equals("insertProduct")) {
+						ObjectInputStream ois = new ObjectInputStream(dis);
+						Product product = (Product) ois.readObject();
+						ProductService.insertProduct(product);
+
+						ois.close();
+						dos.close();
+						dis.close();
+						socket.close();
+					}
+					if(request .equals("insertStorage")) {
+						ObjectInputStream ois = new ObjectInputStream(dis);
+						Storage storage = (Storage) ois.readObject();
+						StorageService.insertStorage(storage);
+
+						ois.close();
+						dos.close();
+						dis.close();
+						socket.close();
+					}
+					if(request.equals("updateProduct")) {
+						ObjectInputStream ois = new ObjectInputStream(dis);
+						Product product = (Product) ois.readObject();
+						ProductService.updateProduct(product);
+
+						ois.close();
+						dos.close();
+						dis.close();
+						socket.close();
+					}
+				} catch (Exception e) {
+					System.err.println(" Connection Error: " + e);
 				}
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			} finally {
-				if (serverSocket != null) {
-					serverSocket.close();
-				}
+			}
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		} finally {
+			if (serverSocket != null) {
+				serverSocket.close();
 			}
 		}
 	}
+}

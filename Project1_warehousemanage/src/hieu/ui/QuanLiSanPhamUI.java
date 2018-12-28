@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 
@@ -36,7 +38,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
 import hieu.model.Category;
+import hieu.model.Interest;
 import hieu.model.Product;
+import hieu.model.Storage;
 import hieu.net.Client;
 import hieu.service.CategoryService;
 
@@ -50,10 +54,13 @@ public class QuanLiSanPhamUI extends JFrame {
 	JTextField txtMasp,txtTen,txtSoLuong,txtGia, txtHang, txtSoLuongNhap, txtGiaNhap, txtMaNhap, txtNgayNhap;
 	JComboBox<Category> cbDanhMuc, cbDanhMuc2;
 	ArrayList<Product> dsSP = null;
+	Vector<Interest> list = null;
+	Vector<Product> listProduct = null;
+	Vector<Storage> liStorages = null;
 	JTable tbSanPham, tbKho, tbDoanhThu;
 	JPanel pnInfo, pnSanPham, pnKho, pnDoanhThu;
 	JScrollPane scpTableSanPham, scpTableKho, scpDoanhThu;
-	JMenuItem itShowTonKho, itShowNhapKho, itShowDoanhThu, itFileTimkienTen, itFileTimkiemMa;
+	JMenuItem itShowTonKho, itShowNhapKho, itShowDoanhThu, itFileTimkienTen, itFileTimkiemMa,itShowContact;
 	JRadioButton raDoanhSo, raLoiNhuan;
 
 	public QuanLiSanPhamUI(String title) {
@@ -78,11 +85,13 @@ public class QuanLiSanPhamUI extends JFrame {
 		itShowTonKho = new JMenuItem("Tồn kho");
 		itShowNhapKho = new JMenuItem("Nhập kho");
 		itShowDoanhThu = new JMenuItem("Doanh thu");
-	
+		itShowContact = new JMenuItem("Show contact");
+
 		mnShow.add(itShowTonKho);
 		mnShow.add(itShowNhapKho);
 		mnShow.add(itShowDoanhThu);
-		
+		mnContact.add(itShowContact);
+
 		JMenu mnTimKiem = new JMenu("Tìm kiếm");
 		itFileTimkiemMa = new JMenuItem("Mã");
 		itFileTimkienTen = new JMenuItem("Tên");
@@ -100,6 +109,15 @@ public class QuanLiSanPhamUI extends JFrame {
 
 	private void addEvent() {
 		// TODO Auto-generated method stub
+		itShowContact.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				JOptionPane.showMessageDialog(null, 
+						"Xin vui lòng liên hệ đến hieu.mdt161530@sis.hust.edu.vn");
+			}
+		});
 		itShowTonKho.addActionListener(new ActionListener() {
 
 			@Override
@@ -111,9 +129,9 @@ public class QuanLiSanPhamUI extends JFrame {
 				pnInfo.add(pnSanPham, BorderLayout.SOUTH);
 			}
 		});
-		
+
 		itShowNhapKho.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
@@ -122,58 +140,60 @@ public class QuanLiSanPhamUI extends JFrame {
 				pnInfo.add(pnKho, BorderLayout.SOUTH);
 			}
 		});
-		
+
 		itShowDoanhThu.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				pnInfo.removeAll();
 				pnInfo.add(scpDoanhThu,BorderLayout.CENTER);
 				pnInfo.add(pnDoanhThu,BorderLayout.SOUTH);
+				showInterest();
 			}
 		});
-		
+
 		showCategory();
 		listDanhMuc.addMouseListener(new MouseListener() {
-			
+
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
 				Category cate = listDanhMuc.getSelectedValue();
 				if(cate == null) return;
 				else {
-					Client client = new Client("localhost", 3333);
-					Vector<Product> list = null;
-					
-					client.sendRequest("listProduct");
-					client.sendRequest(cate.getIdCategory()+"");
-					list = (Vector<Product>) client.receiveAnswer();
-					for(Product pro : list) {
+					Client client1 = new Client("localhost", 3333);
+
+					client1.sendRequest("listProduct");
+					client1.sendRequest(cate.getIdCategory()+"");
+					if(listProduct != null) listProduct.clear();
+					tbmSanPham.setRowCount(0);
+					listProduct = (Vector<Product>) client1.receiveAnswer();
+					for(Product pro : listProduct) {
 						Vector<Object> vec = new Vector<>();
 						vec.add(pro.getID());
 						vec.add(pro.getProductName());
@@ -182,29 +202,338 @@ public class QuanLiSanPhamUI extends JFrame {
 						vec.add(pro.getManufacturerName());
 						tbmSanPham.addRow(vec);
 					}
-					
+
+					Client client2 = new Client("localhost", 3333);
+					client2.sendRequest("listStorage");
+					if(liStorages != null) liStorages.clear();
+					tbmKho.setRowCount(0);
+					liStorages = (Vector<Storage>) client2.receiveAnswer();
+					for(Storage storage: liStorages) {
+						Vector<Object> vec = new Vector<>();
+						vec.add(storage.getID());
+						vec.add(storage.getAmount());
+						vec.add(storage.getUnitPrice());
+						vec.add(storage.getImportDate());
+						tbmKho.addRow(vec);
+					}
+					cbDanhMuc.setSelectedIndex(listDanhMuc.getSelectedIndex());
 					cbDanhMuc2.setSelectedIndex(listDanhMuc.getSelectedIndex());
 				}
 			}
 		});
-		
+
+		tbSanPham.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				int row = tbSanPham.getSelectedRow();
+				if(row == -1 ) return;
+				Product product = listProduct.get(row);
+				txtGia.setText(product.getCost()+"");
+				txtHang.setText(product.getManufacturerName());
+				txtTen.setText(product.getProductName());
+				txtMasp.setText(product.getID()+"");
+				txtSoLuong.setText(product.getAmount()+"");
+			}
+		});
+
+		tbKho.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				int row = tbKho.getSelectedRow();
+				if(row == -1 ) return;
+				Storage storage = liStorages.get(row);
+				txtGiaNhap.setText(storage.getUnitPrice()+"");
+				txtMaNhap.setText(storage.getID()+"");
+				txtNgayNhap.setText(storage.getImportDate());
+				txtSoLuongNhap.setText(storage.getAmount()+"");
+			}
+		});
+
+		btnNewImport.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				txtGiaNhap.setText("");
+				txtMaNhap.setText("");
+				txtNgayNhap.setText("");
+				txtSoLuongNhap.setText("");
+			}
+		});
+		btnSaveImport.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				Storage storage = new Storage();
+				storage.setAmount(Integer.parseInt(txtSoLuongNhap.getText()));
+				storage.setID(Integer.parseInt(txtMaNhap.getText()));
+				storage.setImportDate(txtNgayNhap.getText());
+				storage.setUnitPrice(Integer.parseInt(txtGiaNhap.getText()));
+
+				Client client = new Client("localhost", 3333);
+
+				client.sendRequest("insertStorage");
+				client.sendObject(storage);
+				showCategory();
+			}
+		});
+
+		btRemove.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				Category cate = listDanhMuc.getSelectedValue();
+				cate.setStatus(0);
+
+				Client client = new Client("localhost", 3333);
+				client.sendRequest("updateCate");
+				client.sendObject(cate);
+				showCategory();
+			}
+		});
+		btUpdate.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				Category cate = listDanhMuc.getSelectedValue();
+				String result; 
+				System.out.println(cate.getStatus());
+				result = JOptionPane.showInputDialog("Bạn muốn đổi tên danh mục thành gì?");
+				cate.setNameCategory(result);
+				cate.setStatus(1);
+
+				Client client = new Client("localhost", 3333);
+				client.sendRequest("updateCate");
+				client.sendObject(cate);
+				showCategory();
+			}
+		});
+		btnTaoMoiSp.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				txtGia.setText("");
+				txtHang.setText("");
+				txtMasp.setText("");
+				txtTen.setText("");
+				txtSoLuong.setText("");
+
+			}
+		});
+		btnThem.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				Category cate = listDanhMuc.getSelectedValue();
+				System.out.println(cate.getIdCategory());
+				Product product = new Product();
+				product.setAmount(Integer.parseInt(txtSoLuong.getText()));
+				product.setIdCategory(cate.getIdCategory());
+				product.setCost(Integer.parseInt(txtGia.getText()));
+				product.setID(Integer.parseInt(txtMasp.getText()));
+				product.setProductName(txtTen.getText());
+				product.setManufacturerName(txtHang.getText());
+
+				Client client = new Client("localhost", 3333);
+
+				client.sendRequest("insertProduct");
+				client.sendObject(product);
+				showCategory();
+			}
+		});
+		btnLuuSp.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				Category cate = listDanhMuc.getSelectedValue();
+				System.out.println(cate.getIdCategory());
+				Product product = new Product();
+				product.setAmount(Integer.parseInt(txtSoLuong.getText()));
+				product.setIdCategory(cate.getIdCategory());
+				product.setCost(Integer.parseInt(txtGia.getText()));
+				product.setID(Integer.parseInt(txtMasp.getText()));
+				product.setProductName(txtTen.getText());
+				product.setManufacturerName(txtHang.getText());
+				product.setStatus(1);
+
+				Client client = new Client("localhost", 3333);
+
+				client.sendRequest("updateProduct");
+				client.sendObject(product);
+				showCategory();
+			}
+		});
+		btnXoaSp.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int row = tbSanPham.getSelectedRow();
+				if(row == -1 ) return;
+				Product product = listProduct.get(row);		
+				product.setStatus(0);
+
+				Client client = new Client("localhost", 3333);
+
+				client.sendRequest("updateProduct");
+				client.sendObject(product);
+				showCategory();
+			}
+		});
+		raDoanhSo.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				ArrayList<Interest> listSales = new ArrayList<>();
+				listSales.addAll(list);
+				listSales.sort(new Comparator<Interest>() {
+
+					@Override
+					public int compare(Interest i, Interest o) {
+						// TODO Auto-generated method stub
+						if(i.getSales() == o.getSales()) 
+							return 0;
+						else if(i.getSales() > o.getSales())
+							return -1;
+						else  
+							return 1;
+					}
+				});
+				tbmDoanhThu.setRowCount(0);
+				for(Interest interest: listSales) {
+					Vector<Object> vec = new Vector<>();
+					vec.add(interest.getId());
+					vec.add(interest.getName());
+					vec.add(interest.getSales());
+					vec.add(interest.getProfit());
+					tbmDoanhThu.addRow(vec);
+				}
+				
+			}
+		});
+		raLoiNhuan.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				ArrayList<Interest> listProfit = new ArrayList<>();
+				listProfit.addAll(list);
+				listProfit.sort(new Comparator<Interest>() {
+
+					@Override
+					public int compare(Interest i, Interest o) {
+						// TODO Auto-generated method stub
+						if(i.getProfit() == o.getProfit()) 
+							return 0;
+						else if(i.getProfit() > o.getProfit())
+							return -1;
+						else  
+							return 1;
+					}
+				});
+				tbmDoanhThu.setRowCount(0);
+				for(Interest interest: listProfit) {
+					Vector<Object> vec = new Vector<>();
+					vec.add(interest.getId());
+					vec.add(interest.getName());
+					vec.add(interest.getSales());
+					vec.add(interest.getProfit());
+					tbmDoanhThu.addRow(vec);
+				}
+			}
+		});
 	}
-	
+	private void showInterest() {
+		
+		Client client = new Client("localhost", 3333);
+		client.sendRequest("listInterest");
+		
+		list = (Vector<Interest>) client.receiveAnswer();
+		tbmDoanhThu.setRowCount(0);
+		for(Interest interest: list) {
+			Vector<Object> vec = new Vector<>();
+			vec.add(interest.getId());
+			vec.add(interest.getName());
+			vec.add(interest.getSales());
+			vec.add(interest.getProfit());
+			tbmDoanhThu.addRow(vec);
+		}
+	}
+
 	private void showCategory() {
 		// TODO Auto-generated method stub
 		Vector<Category> list = null;
 		Client client = new Client("localhost", 3333);
-		
+
 		client.sendRequest("listCate");
 		list = (Vector<Category>) client.receiveAnswer();
-		
+
 		listDanhMuc.setListData(list);
 		cbDanhMuc.removeAllItems();
 		cbDanhMuc2.removeAllItems();
-		 for (Category cate : list) {
-			 cbDanhMuc.addItem(cate);
-			 cbDanhMuc2.addItem(cate);
-		 }
+		for (Category cate : list) {
+			cbDanhMuc.addItem(cate);
+			cbDanhMuc2.addItem(cate);
+		}
 	}
 
 	private void addControls() {
@@ -238,14 +567,11 @@ public class QuanLiSanPhamUI extends JFrame {
 		pnLeft.add(scpListDanhMuc, BorderLayout.CENTER);
 
 		JPanel pnButtonleft = new JPanel();
-		btNew = new JButton("New");
+
 		btUpdate = new JButton("Update");
 		btRemove = new JButton("Remove");
-		btnInsert = new JButton("Insert");
 		pnButtonleft.add(btRemove);
 		pnButtonleft.add(btUpdate);
-		pnButtonleft .add(btNew);
-		pnButtonleft.add(btnInsert);
 		pnLeft.add(pnButtonleft,BorderLayout.SOUTH);
 
 		JLabel lbChiTiet = new JLabel("Thông tin chi tiết", JLabel.CENTER);
@@ -254,11 +580,11 @@ public class QuanLiSanPhamUI extends JFrame {
 		pnInfo = new JPanel();
 		pnInfo.setLayout(new BorderLayout());
 		pnRight.add(pnInfo);
-		
+
 		cbDanhMuc = new JComboBox<>();
 		cbDanhMuc2 = new JComboBox<>();
-		
-		
+
+
 		// Tồn kho
 		{
 			tbmSanPham = new DefaultTableModel();
@@ -339,7 +665,7 @@ public class QuanLiSanPhamUI extends JFrame {
 			pnSanPham.add(pnButtonSanPham);
 
 		}
-		
+
 		// Nhập kho
 		{
 			tbmKho = new DefaultTableModel();
@@ -356,46 +682,46 @@ public class QuanLiSanPhamUI extends JFrame {
 		{
 			pnKho = new JPanel();
 			pnKho.setLayout(new BoxLayout(pnKho, BoxLayout.Y_AXIS));
-			
+
 			JPanel pnDanhMuc = new JPanel(new FlowLayout(FlowLayout.CENTER));
 			JLabel lbDanhMuc = new JLabel("Danh mục:");
 			pnDanhMuc.add(lbDanhMuc);
 			pnDanhMuc.add(cbDanhMuc);
 			pnKho.add(pnDanhMuc);
-			
+
 			JPanel pnMaNhap=new JPanel(new FlowLayout(FlowLayout.LEFT));
 			JLabel lblMaNhap=new JLabel("Mã nhập");
 			txtMaNhap=new JTextField(30);
 			pnMaNhap.add(lblMaNhap);
 			pnMaNhap.add(txtMaNhap);
 			pnKho.add(pnMaNhap);
-			
+
 			JPanel pnSoLuongNhap = new JPanel(new FlowLayout(FlowLayout.LEFT));
 			JLabel lblSoLuongNhap = new JLabel("Số lượng nhập");
 			txtSoLuongNhap = new JTextField(30);
 			pnSoLuongNhap.add(lblSoLuongNhap);
 			pnSoLuongNhap.add(txtSoLuongNhap);
 			pnKho.add(pnSoLuongNhap);
-			
+
 			JPanel pnGiaNhap = new JPanel(new FlowLayout(FlowLayout.LEFT));
 			JLabel lblGiaNhap = new JLabel("Giá nhập");
 			txtGiaNhap = new JTextField(30);
 			pnGiaNhap.add(lblGiaNhap);
 			pnGiaNhap.add(txtGiaNhap);
 			pnKho.add(pnGiaNhap);
-			
+
 			JPanel pnNgayNhap = new JPanel(new FlowLayout(FlowLayout.LEFT));
 			JLabel lblNgayNhap = new JLabel("Ngày nhập");
 			txtNgayNhap = new JTextField(30);
 			pnNgayNhap.add(lblNgayNhap);
 			pnNgayNhap.add(txtNgayNhap);
 			pnKho.add(pnNgayNhap);
-			
+
 			cbDanhMuc.setPreferredSize(new Dimension(300, 20));
 			lblGiaNhap.setPreferredSize(lblSoLuongNhap.getPreferredSize());
 			lblMaNhap.setPreferredSize(lblSoLuongNhap.getPreferredSize());
 			lblNgayNhap.setPreferredSize(lblSoLuongNhap.getPreferredSize());
-			
+
 			JPanel pnButtonSanPham=new JPanel();
 			pnButtonSanPham.setLayout(new FlowLayout());
 			btnNewImport =new JButton("New");
@@ -415,7 +741,7 @@ public class QuanLiSanPhamUI extends JFrame {
 			scpDoanhThu = new JScrollPane(tbDoanhThu, 
 					JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			
+
 			pnDoanhThu = new JPanel();
 			JLabel lblSapSep = new JLabel("Sắp xếp theo: ");
 			raDoanhSo = new JRadioButton("Doanh số");

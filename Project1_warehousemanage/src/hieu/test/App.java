@@ -7,8 +7,8 @@ public class App {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		QuanLiSanPhamUI ui = new QuanLiSanPhamUI("QLSP");
-//		UILogin login = new UILogin();
+//		QuanLiSanPhamUI ui = new QuanLiSanPhamUI("QLSP");
+		UILogin login = new UILogin();
 	}
 
 }

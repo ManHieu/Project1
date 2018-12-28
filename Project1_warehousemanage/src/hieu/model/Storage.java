@@ -1,6 +1,8 @@
 package hieu.model;
 
-public class Storage {
+import java.io.Serializable;
+
+public class Storage implements Serializable{
 	private int ID;
 	private int unitPrice;
 	private int amount;
